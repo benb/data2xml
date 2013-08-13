@@ -20,6 +20,7 @@ var defaults = {
     'valProp'   : '_value',
     'undefined' : 'omit',
     'null'      : 'omit',
+    'header'    : true
 };
 
 var xmlHeader = '<?xml version="1.0" encoding="utf-8"?>\n';
@@ -43,7 +44,7 @@ module.exports = function(opts) {
     }
 
     return function(name, data) {
-        var xml = xmlHeader;
+        var xml = opts.header ? xmlHeader : '';
         xml += makeElement(name, data, opts);
         return xml;
     };
