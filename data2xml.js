@@ -20,13 +20,18 @@ var defaults = {
     'valProp'   : '_value',
     'undefined' : 'omit',
     'null'      : 'omit',
-    'header'    : true
+    'header'    : true,
+    'leaveOpen' : false
 };
 
 var xmlHeader = '<?xml version="1.0" encoding="utf-8"?>\n';
 
 module.exports = function(opts) {
     opts = opts || {};
+
+    if ( typeof opts.header == "undefined"){
+      opts.header = defaults.header;
+    }
 
     opts.attrProp = opts.attrProp || defaults.attrProp;
     opts.valProp  = opts.valProp  || defaults.valProp;
@@ -43,9 +48,11 @@ module.exports = function(opts) {
         opts['null'] = defaults['null'];
     }
 
+    opts.leaveOpen = opts.leaveOpen || defaults.leaveOpen;
+
     return function(name, data) {
         var xml = opts.header ? xmlHeader : '';
-        xml += makeElement(name, data, opts);
+        xml += makeElement(name, data, opts, opts.leaveOpen);
         return xml;
     };
 };
@@ -75,7 +82,7 @@ function makeEndTag(name) {
     return '</' + name + '>';
 }
 
-function makeElement(name, data, opts) {
+function makeElement(name, data, opts, leaveOpen) {
     var element = '';
     if ( Array.isArray(data) ) {
         data.forEach(function(v) {
@@ -116,7 +123,9 @@ function makeElement(name, data, opts) {
             }
             element += makeElement(el, data[el], opts);
         }
-        element += makeEndTag(name);
+        if (!leaveOpen){
+          element += makeEndTag(name);
+        }
         return element;
     }
     else {
